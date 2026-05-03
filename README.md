@@ -1,6 +1,6 @@
 # TongTong
 
-> Go Dutch · Chip In · 制吧 · साझा करना
+> Go Dutch · Chip In · 制吧
 
 A lightweight, client-side car ride cost calculator for Malaysian drivers and passengers. Split fuel and toll costs fairly — no accounts, no backend, no friction.
 
