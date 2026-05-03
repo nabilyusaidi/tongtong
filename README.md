@@ -1,6 +1,6 @@
 # TongTong
 
-> Nanti kita tongtong tau. · Go Dutch · Chip In · AA · 除
+> Nanti kita tongtong tau. · Go Dutch · Chip In · 我们AA · 我们除
 
 A lightweight, client-side car ride cost calculator for Malaysian drivers and passengers. Split fuel and toll costs fairly. No accounts, no backend, no friction.
 
@@ -13,8 +13,7 @@ A lightweight, client-side car ride cost calculator for Malaysian drivers and pa
 Enter your fuel price, fuel consumption, trip distance, and toll. TongTong calculates exactly how much each person chips in.
 
 - Supports km/L and L/100km fuel consumption units
-- Dark mode with system preference detection
-- Fully offline-capable. No network requests.
+- Fully offline-capable. No network requests
 
 ---
 
@@ -72,6 +71,7 @@ Deployed on Vercel.
 ## Future improvements
 
 - Automated weekly fuel price updates
+- EV Support
 
 ---
 
