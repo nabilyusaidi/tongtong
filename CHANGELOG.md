@@ -10,9 +10,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [0.1.0] — TBD
+## [0.1.0] — 2026-05-03
 
 ### Added
-- Initial project scaffold
-- Vite + React + Tailwind CSS setup
-- Project documentation (architecture, features)
+- Vite + React + Tailwind v4 scaffold
+- Core file structure (`src/components/`, `src/lib/calculator.js`)
+- Deployed to Vercel at https://tongtong-alpha.vercel.app/
