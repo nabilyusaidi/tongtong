@@ -5,8 +5,8 @@ export default function ResultCard({ result }) {
   const { perPerson, fuelCost, tollCost, totalCost, passengers } = result
 
   return (
-    <div className="bg-white dark:bg-neutral-900 border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-md shadow-slate-300/50 dark:shadow-none">
-      <div className="bg-blue-50 dark:bg-blue-500/10 border-b border-blue-100 dark:border-white/5 px-5 py-5">
+    <div className="bg-white dark:bg-neutral-900 border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-md shadow-slate-400/40 dark:shadow-none">
+      <div className="bg-blue-100/60 dark:bg-blue-500/10 border-b border-blue-200 dark:border-white/5 px-5 py-5">
         <p className="text-[10px] font-bold uppercase tracking-widest text-blue-500 dark:text-blue-400 mb-1">Each person pays</p>
         <p className="text-5xl font-black tracking-tight text-blue-700 dark:text-blue-200">RM {perPerson.toFixed(2)}</p>
       </div>
@@ -17,7 +17,7 @@ export default function ResultCard({ result }) {
         <div className="border-t border-slate-100 dark:border-white/5 pt-3">
           <Row label="Total" value={`RM ${totalCost.toFixed(2)}`} bold />
         </div>
-        <div className="flex items-center justify-center gap-2 bg-slate-50 dark:bg-neutral-800/60 border border-slate-100 dark:border-white/5 rounded-xl px-4 py-2.5 text-xs text-slate-500 dark:text-neutral-400">
+        <div className="flex items-center justify-center gap-2 bg-slate-100 dark:bg-neutral-800/60 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-2.5 text-xs text-slate-500 dark:text-neutral-400">
           <span className="font-semibold text-slate-700 dark:text-neutral-200">RM {totalCost.toFixed(2)}</span>
           <span>÷</span>
           <span className="font-semibold text-slate-700 dark:text-neutral-200">{passengers} {passengers === 1 ? 'person' : 'people'}</span>

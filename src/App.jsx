@@ -61,7 +61,7 @@ export default function App() {
         <div className="flex items-center gap-2.5">
           <span className="text-lg font-black tracking-tight text-blue-600 dark:text-blue-300">TongTong</span>
           <div className="w-px h-4 bg-slate-200 dark:bg-white/10" />
-          <span className="text-xs text-slate-400 dark:text-neutral-500 hidden sm:block">by Nabil Yusaidi</span>
+          <span className="text-xs text-slate-400 dark:text-neutral-500">by Nabil Yusaidi</span>
           <div className="flex items-center gap-1">
             <a
               href="https://www.linkedin.com/in/nabil-yusaidi-752650234/"

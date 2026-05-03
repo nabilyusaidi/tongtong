@@ -22,7 +22,7 @@ const steps = [
   {
     n: 4,
     title: 'Toll',
-    body: "Optional. Remember the rates. Going and coming back? Double it too.",
+    body: "Remember the rates. Going and coming back? Double it too.",
   },
   {
     n: 5,

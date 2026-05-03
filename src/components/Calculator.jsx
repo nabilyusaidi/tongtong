@@ -91,6 +91,7 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
           <Divider />
           <Field
             label="Toll"
+            optional
             description="Double it for return trips."
             unit="RM"
             value={toll}
@@ -156,13 +157,14 @@ function Section({ label, children }) {
   )
 }
 
-function Field({ label, required, description, unit, onUnitClick, value, onChange, placeholder, step }) {
+function Field({ label, required, optional, description, unit, onUnitClick, value, onChange, placeholder, step }) {
   return (
     <div className="flex items-center justify-between gap-4 py-1">
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-slate-900 dark:text-white">
+        <p className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
           {label}
-          {required && value === '' && <span className="ml-1 text-red-500 dark:text-red-400">*</span>}
+          {required && value === '' && <span className="text-red-500 dark:text-red-400">*</span>}
+          {optional && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-neutral-800 text-slate-400 dark:text-neutral-500">Optional</span>}
         </p>
         <p className="text-xs text-slate-600 dark:text-neutral-400">{description}</p>
       </div>

@@ -1,19 +1,8 @@
 # Dependencies
 node_modules/
 
-# Build output
-dist/
-
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Editor
-.vscode/
-
-# OS
-Thumbs.db
+#Build output
+/dist
 
 # Docs
 docs/*

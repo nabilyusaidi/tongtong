@@ -13,8 +13,8 @@ export default function PassengerChips({ result, passengers }) {
             key={i}
             className={`flex flex-col items-center rounded-xl px-4 py-3 text-sm flex-1 min-w-[72px] ${
               i === 0
-                ? 'bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-400/20'
-                : 'bg-slate-50 dark:bg-neutral-800 border border-slate-100 dark:border-white/5'
+                ? 'bg-blue-100/60 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-400/20'
+                : 'bg-slate-100/60 dark:bg-neutral-800 border border-slate-200 dark:border-white/5'
             }`}
           >
             <span className={`text-xs font-medium mb-1 ${i === 0 ? 'text-blue-500 dark:text-blue-400' : 'text-slate-600 dark:text-neutral-500'}`}>
