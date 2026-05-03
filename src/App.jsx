@@ -1,7 +1,13 @@
+import Calculator from './components/Calculator'
+
 export default function App() {
   return (
     <div className="min-h-screen bg-white">
-      <h1 className="text-2xl font-bold text-center p-8">TongTong</h1>
+      <header className="text-center pt-10 pb-6">
+        <h1 className="text-3xl font-bold tracking-tight">TongTong</h1>
+        <p className="text-sm text-gray-500 mt-1">Split your ride costs fairly</p>
+      </header>
+      <Calculator />
     </div>
   )
 }
