@@ -1,8 +1,10 @@
 # TongTong
 
-> Go Dutch · Chip In · 制吧
+> Nanti kita tongtong tau. · Go Dutch · Chip In · AA · 除
 
-A lightweight, client-side car ride cost calculator for Malaysian drivers and passengers. Split fuel and toll costs fairly — no accounts, no backend, no friction.
+A lightweight, client-side car ride cost calculator for Malaysian drivers and passengers. Split fuel and toll costs fairly. No accounts, no backend, no friction.
+
+**Live:** https://tongtong-alpha.vercel.app
 
 ---
 
@@ -10,7 +12,9 @@ A lightweight, client-side car ride cost calculator for Malaysian drivers and pa
 
 Enter your fuel price, fuel consumption, trip distance, and toll. TongTong calculates exactly how much each person chips in.
 
-Supports one-way and two-way (return) trips.
+- Supports km/L and L/100km fuel consumption units
+- Dark mode with system preference detection
+- Fully offline-capable. No network requests.
 
 ---
 
@@ -30,17 +34,8 @@ Supports one-way and two-way (return) trips.
 ## Getting started
 
 ```bash
-# Install dependencies
 pnpm install
-
-# Start dev server
 pnpm dev
-
-# Build for production
-pnpm build
-
-# Preview production build
-pnpm preview
 ```
 
 ---
@@ -49,22 +44,34 @@ pnpm preview
 
 ```
 tongtong/
-├── docs/
-│   ├── architecture.md   # Single source of truth
-│   └── features.md       # Feature list and status
+├── public/
+│   └── favicon.svg
 ├── src/
-│   ├── components/       # React components
-│   ├── lib/              # Pure calculation logic
-│   └── main.jsx          # Entry point
-├── CHANGELOG.md
-└── README.md
+│   ├── components/
+│   │   ├── Calculator.jsx
+│   │   ├── Explanation.jsx
+│   │   ├── Guide.jsx
+│   │   ├── PassengerChips.jsx
+│   │   └── ResultCard.jsx
+│   ├── lib/
+│   │   └── calculator.js
+│   ├── App.jsx
+│   └── main.jsx
+└── docs/
+    └── architecture.md
 ```
 
 ---
 
 ## Deployment
 
-Connected to Vercel via GitHub. Every push to `main` triggers a production deploy automatically.
+Deployed on Vercel.
+
+---
+
+## Future improvements
+
+- Automated weekly fuel price updates (currently hardcoded in the explanation section)
 
 ---
 
