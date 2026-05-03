@@ -4,7 +4,7 @@ import Guide from './components/Guide'
 import Explanation from './components/Explanation'
 import ResultCard from './components/ResultCard'
 
-const taglines = ['Go Dutch', 'Chip In', '制吧']
+const taglines = ['tongtong','Go Dutch', 'Chip In', 'AA', '除',]
 
 function SunIcon() {
   return (
@@ -46,7 +46,7 @@ export default function App() {
           <span className="text-[10px] font-semibold bg-blue-50 dark:bg-blue-400/10 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-400/20 px-2 py-0.5 rounded-full">beta</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-600 dark:text-neutral-500 hidden sm:block">Split rides fairly</span>
+          <span className="text-xs text-slate-600 dark:text-neutral-500 hidden sm:block">Split fuel and toll fairly</span>
           <button
             type="button"
             onClick={() => setIsDark(d => !d)}
@@ -61,9 +61,9 @@ export default function App() {
       <div className="max-w-4xl mx-auto px-5 py-10 space-y-8">
         <div>
           <h1 className="text-3xl font-black tracking-tight text-blue-600 dark:text-blue-200 leading-tight mb-2">
-            How much does everyone owe?
+            Nanti kita tongtong tau.
           </h1>
-          <p className="text-slate-600 dark:text-neutral-400 text-sm mb-4">Enter your trip details and split the cost fairly.</p>
+          <p className="text-slate-600 dark:text-neutral-400 text-sm mb-4">Split fuel and toll costs fairly.</p>
           <div className="flex flex-wrap gap-2">
             {taglines.map(tag => (
               <span key={tag} className="text-xs border border-slate-300 bg-white/70 dark:bg-transparent dark:border-white/10 text-slate-600 dark:text-neutral-400 px-3 py-1 rounded-full shadow-sm shadow-slate-300/30 dark:shadow-none">
