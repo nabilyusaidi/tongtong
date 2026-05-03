@@ -52,7 +52,7 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col h-full space-y-3">
       <Section label="Trip details">
         <div className="space-y-1">
           <Field
@@ -109,7 +109,7 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
                 Number of people
                 {passengers === '' && <span className="ml-1 text-red-500 dark:text-red-400">*</span>}
               </p>
-              <p className="text-xs text-slate-500 dark:text-neutral-500">Including the driver</p>
+              <p className="text-xs text-slate-500 dark:text-neutral-400">Including the driver</p>
             </div>
             <input
               type="number"
@@ -137,9 +137,9 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
         type="button"
         onClick={handleCalculate}
         disabled={!hasValidInputs}
-        className="w-full py-3.5 rounded-xl font-semibold text-sm transition-all
+        className="mt-auto w-full py-3.5 rounded-xl font-semibold text-sm transition-all
           bg-blue-600 hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-400 text-white
-          disabled:bg-slate-100 disabled:text-slate-400 dark:disabled:bg-neutral-800 dark:disabled:text-neutral-500 disabled:cursor-not-allowed"
+          disabled:bg-white disabled:text-slate-400 disabled:border disabled:border-slate-300 dark:disabled:bg-neutral-800 dark:disabled:text-neutral-500 dark:disabled:border-transparent disabled:cursor-not-allowed"
       >
         {hasValidInputs ? 'Calculate →' : 'Fill in your trip details'}
       </button>
@@ -164,7 +164,7 @@ function Field({ label, required, description, unit, onUnitClick, value, onChang
           {label}
           {required && value === '' && <span className="ml-1 text-red-500 dark:text-red-400">*</span>}
         </p>
-        <p className="text-xs text-slate-600 dark:text-neutral-500">{description}</p>
+        <p className="text-xs text-slate-600 dark:text-neutral-400">{description}</p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
         <input
@@ -186,7 +186,7 @@ function Field({ label, required, description, unit, onUnitClick, value, onChang
             {unit}
           </button>
         ) : (
-          <span className="text-xs text-center text-slate-600 dark:text-neutral-500 w-16">{unit}</span>
+          <span className="text-xs text-center text-slate-600 dark:text-neutral-600 w-16">{unit}</span>
         )}
       </div>
     </div>

@@ -18,5 +18,5 @@ export function calculateTrip({ fuelPrice, consumption, distance, toll, passenge
   const totalCost = calculateTotalCost(fuelCost, effectiveToll)
   const perPerson = calculatePerPerson(totalCost, passengers)
 
-  return { fuelCost, tollCost: effectiveToll, totalCost, perPerson }
+  return { fuelCost, tollCost: effectiveToll, totalCost, perPerson, passengers }
 }

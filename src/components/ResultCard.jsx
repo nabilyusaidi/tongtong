@@ -2,7 +2,7 @@
  * @param {{ result: { perPerson: number, fuelCost: number, tollCost: number, totalCost: number } }} props
  */
 export default function ResultCard({ result }) {
-  const { perPerson, fuelCost, tollCost, totalCost } = result
+  const { perPerson, fuelCost, tollCost, totalCost, passengers } = result
 
   return (
     <div className="bg-white dark:bg-neutral-900 border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-md shadow-slate-300/50 dark:shadow-none">
@@ -16,6 +16,13 @@ export default function ResultCard({ result }) {
         <Row label="Toll" value={`RM ${tollCost.toFixed(2)}`} />
         <div className="border-t border-slate-100 dark:border-white/5 pt-3">
           <Row label="Total" value={`RM ${totalCost.toFixed(2)}`} bold />
+        </div>
+        <div className="flex items-center justify-center gap-2 bg-slate-50 dark:bg-neutral-800/60 border border-slate-100 dark:border-white/5 rounded-xl px-4 py-2.5 text-xs text-slate-500 dark:text-neutral-400">
+          <span className="font-semibold text-slate-700 dark:text-neutral-200">RM {totalCost.toFixed(2)}</span>
+          <span>÷</span>
+          <span className="font-semibold text-slate-700 dark:text-neutral-200">{passengers} {passengers === 1 ? 'person' : 'people'}</span>
+          <span>=</span>
+          <span className="font-bold text-blue-600 dark:text-blue-400">RM {perPerson.toFixed(2)}</span>
         </div>
       </div>
     </div>

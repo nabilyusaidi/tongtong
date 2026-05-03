@@ -23,6 +23,23 @@ function MoonIcon() {
   )
 }
 
+function LinkedInIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
+      <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  )
+}
+
+function GitHubIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" />
+    </svg>
+  )
+}
+
 export default function App() {
   const [result, setResult] = useState(null)
   const resultRef = useRef(null)
@@ -41,12 +58,32 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-neutral-950 text-slate-900 dark:text-white transition-colors">
       <nav className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-white/5 bg-white shadow-sm shadow-slate-300/40 dark:bg-neutral-950 dark:shadow-none">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <span className="text-lg font-black tracking-tight text-blue-600 dark:text-blue-300">TongTong</span>
-          <span className="text-[10px] font-semibold bg-blue-50 dark:bg-blue-400/10 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-400/20 px-2 py-0.5 rounded-full">beta</span>
+          <div className="w-px h-4 bg-slate-200 dark:bg-white/10" />
+          <span className="text-xs text-slate-400 dark:text-neutral-500 hidden sm:block">by Nabil Yusaidi</span>
+          <div className="flex items-center gap-1">
+            <a
+              href="https://www.linkedin.com/in/nabil-yusaidi-752650234/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 dark:text-neutral-500 hover:bg-slate-100 dark:hover:bg-neutral-800 hover:text-slate-600 dark:hover:text-neutral-300 transition-colors"
+              aria-label="LinkedIn"
+            >
+              <LinkedInIcon />
+            </a>
+            <a
+              href="https://github.com/nabilyusaidi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 dark:text-neutral-500 hover:bg-slate-100 dark:hover:bg-neutral-800 hover:text-slate-600 dark:hover:text-neutral-300 transition-colors"
+              aria-label="GitHub"
+            >
+              <GitHubIcon />
+            </a>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-600 dark:text-neutral-500 hidden sm:block">Split fuel and toll fairly</span>
+        <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => setIsDark(d => !d)}
@@ -61,9 +98,9 @@ export default function App() {
       <div className="max-w-4xl mx-auto px-5 py-10 space-y-8">
         <div>
           <h1 className="text-3xl font-black tracking-tight text-blue-600 dark:text-blue-200 leading-tight mb-2">
-            Nanti kita tongtong tau.
+            Nanti kita tongtong tau
           </h1>
-          <p className="text-slate-600 dark:text-neutral-400 text-sm mb-4">Split fuel and toll costs fairly.</p>
+          <p className="text-slate-600 dark:text-neutral-400 text-sm mb-4">Split fuel and toll costs fairly</p>
           <div className="flex flex-wrap gap-2">
             {taglines.map(tag => (
               <span key={tag} className="text-xs border border-slate-300 bg-white/70 dark:bg-transparent dark:border-white/10 text-slate-600 dark:text-neutral-400 px-3 py-1 rounded-full shadow-sm shadow-slate-300/30 dark:shadow-none">
@@ -73,7 +110,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
           <div>
             <Guide />
           </div>
