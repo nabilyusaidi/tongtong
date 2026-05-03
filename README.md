@@ -71,7 +71,7 @@ Deployed on Vercel.
 
 ## Future improvements
 
-- Automated weekly fuel price updates (currently hardcoded in the explanation section)
+- Automated weekly fuel price updates
 
 ---
 
