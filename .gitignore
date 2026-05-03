@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode/
+
+# OS
+Thumbs.db
+
+# Docs
+docs/*
+!docs/architecture.md
