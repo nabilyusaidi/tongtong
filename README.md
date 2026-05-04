@@ -1,6 +1,6 @@
 # TongTong
 
-> Nanti kita tongtong tau. · Go Dutch · Chip In · 我们AA · 我们除
+> Nanti kita tongtong tau. · Go Dutch · Chip In · 我们AA lah · 我们除 lah
 
 A lightweight, client-side car ride cost calculator for Malaysian drivers and passengers. Split fuel and toll costs fairly. No accounts, no backend, no friction.
 
