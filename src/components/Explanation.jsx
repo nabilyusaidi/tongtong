@@ -1,47 +1,5 @@
 const faqs = [
   {
-    q: (
-      <>
-        <sup>1</sup> What fuel price should I enter?
-      </>
-    ),
-    a: (
-      <>
-        <strong className="dark:text-white">From 30 April 2026 to 6 May 2026:</strong>
-        <br />
-        <span className="block">
-          <span className="inline-grid grid-cols-[3.25rem_auto_1fr] gap-x-1">
-            <span>RON95</span>
-            <span>:</span>
-            <span>RM3.97/L AND RM1.99/L (BUDI95)</span>
-          </span>
-        </span>
-        <span className="block">
-          <span className="inline-grid grid-cols-[3.25rem_auto_1fr] gap-x-1">
-            <span>RON97</span>
-            <span>:</span>
-            <span>RM4.90/L</span>
-          </span>
-        </span>
-        <span className="block">
-          <span className="inline-grid grid-cols-[3.25rem_auto_1fr] gap-x-1">
-            <span>Diesel</span>
-            <span>:</span>
-            <span>RM5.12/L in Peninsular Malaysia, RM 2.15/L for East Malaysia</span>
-          </span>
-        </span>
-        <a
-          href="https://ringgitplus.com/en/blog/personal-finance-news/petrol-price-malaysia-live-updates-ron95-ron97-diesel.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block mt-2 text-xs font-medium text-slate-400 dark:text-neutral-600 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
-        >
-          Source: RinggitPlus
-        </a>
-      </>
-    ),
-  },
-  {
     q: 'How is fuel cost calculated?',
     a: (
       <>

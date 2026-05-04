@@ -2,14 +2,17 @@ import { useEffect, useMemo, useState } from 'react'
 import { calculateTrip } from '../lib/calculator'
 
 export default function Calculator({ onResultChange, resultTargetRef }) {
-  const [fuelPrice, setFuelPrice] = useState('')
+  const [budi95Price, setBudi95Price] = useState(1.99)
+  const [marketPrice, setMarketPrice] = useState(null)
+  const [useMarketRate, setUseMarketRate] = useState(false)
+  const [priceDate, setPriceDate] = useState(null)
   const [consumption, setConsumption] = useState('')
   const [consumptionUnit, setConsumptionUnit] = useState('km/L')
   const [distance, setDistance] = useState('')
   const [toll, setToll] = useState('')
   const [passengers, setPassengers] = useState('2')
 
-  const parsedFuelPrice = parseFloat(fuelPrice)
+  const fuelPrice = useMarketRate && marketPrice !== null ? marketPrice : budi95Price
   const rawConsumption = parseFloat(consumption)
   const parsedConsumption = consumptionUnit === 'km/L' && rawConsumption > 0
     ? 100 / rawConsumption
@@ -21,12 +24,12 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
   const hasValidPassengers = passengers !== '' && !passengerError
 
   const hasValidInputs =
-    parsedFuelPrice > 0 && parsedConsumption > 0 && parsedDistance > 0 && hasValidPassengers
+    parsedConsumption > 0 && parsedDistance > 0 && hasValidPassengers
 
   const result = useMemo(() => (
     hasValidInputs
       ? calculateTrip({
-          fuelPrice: parsedFuelPrice,
+          fuelPrice,
           consumption: parsedConsumption,
           distance: parsedDistance,
           toll: parsedToll,
@@ -34,11 +37,24 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
           isReturn: false,
         })
       : null
-  ), [hasValidInputs, parsedFuelPrice, parsedConsumption, parsedDistance, parsedToll, parsedPassengers])
+  ), [hasValidInputs, fuelPrice, parsedConsumption, parsedDistance, parsedToll, parsedPassengers])
 
   useEffect(() => {
     onResultChange?.(result)
   }, [onResultChange, result])
+
+  useEffect(() => {
+    fetch('https://api.data.gov.my/data-catalogue/?id=fuelprice&limit=1&sort=-date')
+      .then(r => r.json())
+      .then(data => {
+        const row = data[0]
+        if (!row) return
+        if (row.ron95_budi95) setBudi95Price(row.ron95_budi95)
+        if (row.ron95) setMarketPrice(row.ron95)
+        if (row.date) setPriceDate(row.date)
+      })
+      .catch(() => {})
+  }, [])
 
   function handleCalculate() {
     if (result) {
@@ -55,15 +71,12 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
     <div className="flex flex-col h-full space-y-3">
       <Section label="Trip details">
         <div className="space-y-1">
-          <Field
-            label="Fuel Price"
-            required
-            description="Current pump price"
-            unit="RM/L"
-            value={fuelPrice}
-            onChange={setFuelPrice}
-            placeholder="1.99"
-            step="0.01"
+          <FuelPriceRow
+            budi95Price={budi95Price}
+            marketPrice={marketPrice}
+            useMarketRate={useMarketRate}
+            setUseMarketRate={setUseMarketRate}
+            priceDate={priceDate}
           />
           <Divider />
           <Field
@@ -144,6 +157,53 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
       >
         {hasValidInputs ? 'Calculate →' : 'Fill in your trip details'}
       </button>
+    </div>
+  )
+}
+
+function FuelPriceRow({ budi95Price, marketPrice, useMarketRate, setUseMarketRate, priceDate }) {
+  const formattedDate = priceDate
+    ? new Date(priceDate).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })
+    : null
+
+  return (
+    <div className="flex items-center justify-between gap-4 py-1">
+      <div className="min-w-0">
+        <p className="text-sm font-semibold text-slate-900 dark:text-white">Fuel Price</p>
+        <p className="text-xs text-slate-600 dark:text-neutral-400">
+          {formattedDate ? `Updated ${formattedDate}` : 'Subsidised rate'}
+        </p>
+      </div>
+      {marketPrice !== null ? (
+        <div className="flex shrink-0 rounded-lg border border-slate-200 dark:border-white/5 overflow-hidden text-xs font-semibold">
+          <button
+            type="button"
+            onClick={() => setUseMarketRate(false)}
+            className={`px-2.5 py-2 transition-colors ${
+              !useMarketRate
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-50 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-100 dark:hover:bg-neutral-700'
+            }`}
+          >
+            BUDI95 · RM{budi95Price.toFixed(2)}
+          </button>
+          <button
+            type="button"
+            onClick={() => setUseMarketRate(true)}
+            className={`px-2.5 py-2 transition-colors border-l border-slate-200 dark:border-white/5 ${
+              useMarketRate
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-50 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-100 dark:hover:bg-neutral-700'
+            }`}
+          >
+            Market · RM{marketPrice.toFixed(2)}
+          </button>
+        </div>
+      ) : (
+        <span className="text-sm font-semibold text-slate-600 dark:text-white shrink-0">
+          RM{budi95Price.toFixed(2)}
+        </span>
+      )}
     </div>
   )
 }

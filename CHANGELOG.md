@@ -9,7 +9,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- Live fuel price toggle — fetches RON95 and BUDI95 rates from data.gov.my on load; pill toggle switches between subsidised (RM1.99) and market rate; falls back to RM1.99 if fetch fails
 - `calculateTrip()` wrapper in `src/lib/calculator.js` — handles one-way and return trips, returns fuelCost, tollCost, totalCost, perPerson
+
+### Removed
+- Manual fuel price text input from calculator form
+- "What fuel price should I enter?" FAQ entry from Explanation.jsx
 
 ---
 

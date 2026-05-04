@@ -31,7 +31,7 @@ TongTong is a static, client-side web application. It calculates how much each p
 | No backend | Zero server-side code. No API routes. No database. |
 | No auth | No accounts, no login, no sessions. Ever. |
 | No component libraries | Plain Tailwind CSS only. |
-| No external API calls | All computation is pure JS, fully offline-capable. |
+| External API calls | Phase 1–5: none — pure JS, fully offline-capable. Phase 6+: `data.gov.my` (fuel price fetch) and Google Maps JS SDK (Places Autocomplete + Distance Matrix). Falls back gracefully if either is unavailable. |
 | Mobile-first | Must work on a 375px viewport in a moving car. |
 | Zero config deploy | Must deploy to Vercel with no custom build configuration. |
 
