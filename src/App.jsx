@@ -4,7 +4,7 @@ import Guide from './components/Guide'
 import Explanation from './components/Explanation'
 import ResultCard from './components/ResultCard'
 
-const taglines = ['tongtong','Go Dutch', 'Chip In', '我们AA', '我们除']
+const taglines = ['tongtong','Go Dutch', 'Chip In', '我们AA lah', '我们除 lah']
 
 function SunIcon() {
   return (
