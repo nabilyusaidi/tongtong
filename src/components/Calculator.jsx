@@ -1,30 +1,32 @@
 import { useEffect, useMemo, useState } from 'react'
 import { calculateTrip } from '../lib/calculator'
 
+const CAR_PRESETS = {
+  hatchback: { label: 'Hatchback', consumption: 6.5 },
+  sedan:     { label: 'Sedan',     consumption: 7.5 },
+  suv:       { label: 'SUV',       consumption: 9.5 },
+  mpv:       { label: 'MPV',       consumption: 11.0 },
+}
+
 export default function Calculator({ onResultChange, resultTargetRef }) {
   const [budi95Price, setBudi95Price] = useState(1.99)
   const [marketPrice, setMarketPrice] = useState(null)
   const [useMarketRate, setUseMarketRate] = useState(false)
   const [priceDate, setPriceDate] = useState(null)
-  const [consumption, setConsumption] = useState('')
-  const [consumptionUnit, setConsumptionUnit] = useState('km/L')
+  const [carType, setCarType] = useState('hatchback')
   const [distance, setDistance] = useState('')
   const [toll, setToll] = useState('')
   const [passengers, setPassengers] = useState('2')
 
   const fuelPrice = useMarketRate && marketPrice !== null ? marketPrice : budi95Price
-  const rawConsumption = parseFloat(consumption)
-  const parsedConsumption = consumptionUnit === 'km/L' && rawConsumption > 0
-    ? 100 / rawConsumption
-    : rawConsumption
+  const parsedConsumption = CAR_PRESETS[carType].consumption
   const parsedDistance = parseFloat(distance)
   const parsedToll = parseFloat(toll) || 0
   const parsedPassengers = Number(passengers)
   const passengerError = getPassengerError(passengers, parsedPassengers)
   const hasValidPassengers = passengers !== '' && !passengerError
 
-  const hasValidInputs =
-    parsedConsumption > 0 && parsedDistance > 0 && hasValidPassengers
+  const hasValidInputs = parsedDistance > 0 && hasValidPassengers
 
   const result = useMemo(() => (
     hasValidInputs
@@ -62,11 +64,6 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
     }
   }
 
-  function toggleConsumptionUnit() {
-    setConsumptionUnit(u => u === 'L/100km' ? 'km/L' : 'L/100km')
-    setConsumption('')
-  }
-
   return (
     <div className="flex flex-col h-full space-y-3">
       <Section label="Trip details">
@@ -79,17 +76,7 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
             priceDate={priceDate}
           />
           <Divider />
-          <Field
-            label="Fuel Consumption"
-            required
-            description={consumptionUnit === 'L/100km' ? 'Litres per 100 km' : 'Kilometres per litre'}
-            unit={consumptionUnit}
-            onUnitClick={toggleConsumptionUnit}
-            value={consumption}
-            onChange={setConsumption}
-            placeholder={consumptionUnit === 'L/100km' ? '8' : '12.5'}
-            step="0.1"
-          />
+          <CarTypeSelector value={carType} onChange={setCarType} />
           <Divider />
           <Field
             label="Distance"
@@ -157,6 +144,33 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
       >
         {hasValidInputs ? 'Calculate →' : 'Fill in your trip details'}
       </button>
+    </div>
+  )
+}
+
+function CarTypeSelector({ value, onChange }) {
+  return (
+    <div className="py-1 space-y-2">
+      <div>
+        <p className="text-sm font-semibold text-slate-900 dark:text-white">Car Type</p>
+        <p className="text-xs text-slate-600 dark:text-neutral-400">Affects fuel consumption estimate</p>
+      </div>
+      <div className="grid grid-cols-4 gap-1.5">
+        {Object.entries(CAR_PRESETS).map(([key, { label }]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onChange(key)}
+            className={`py-2 rounded-lg text-xs font-semibold transition-colors ${
+              value === key
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-50 dark:bg-neutral-800 border border-slate-200 dark:border-white/5 text-slate-600 dark:text-neutral-400 hover:bg-slate-100 dark:hover:bg-neutral-700'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

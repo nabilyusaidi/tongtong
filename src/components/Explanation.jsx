@@ -28,10 +28,6 @@ const faqs = [
       </>
     ),
   },
-  {
-    q: 'What is the difference between L/100km and km/L?',
-    a: "km/L is kilometres per litre, so higher means more efficient. L/100km is how many litres your car burns per 100 km, so lower means more efficient. TongTong converts automatically when you tap the unit.",
-  },
 ]
 
 export default function Explanation() {
