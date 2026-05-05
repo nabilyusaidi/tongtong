@@ -99,15 +99,14 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
             }}
           />
           <Divider />
-          <Field
-            label="Toll"
-            optional
-            description="Double it for return trips."
-            unit="RM"
-            value={toll}
-            onChange={setToll}
-            placeholder="0.00"
-            step="0.10"
+          <TollSection
+            hasToll={hasToll}
+            setHasToll={setHasToll}
+            autoToll={autoToll}
+            tollOverridden={tollOverridden}
+            setTollOverridden={setTollOverridden}
+            toll={toll}
+            setToll={setToll}
           />
         </div>
       </Section>
@@ -342,6 +341,81 @@ function FuelPriceRow({ budi95Price, marketPrice, useMarketRate, setUseMarketRat
         <span className="text-sm font-semibold text-slate-600 dark:text-white shrink-0">
           RM{budi95Price.toFixed(2)}
         </span>
+      )}
+    </div>
+  )
+}
+
+function TollSection({ hasToll, setHasToll, autoToll, tollOverridden, setTollOverridden, toll, setToll }) {
+  return (
+    <div className="py-1 space-y-2">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-slate-900 dark:text-white">Toll</p>
+          <p className="text-xs text-slate-600 dark:text-neutral-400">Double it for return trips.</p>
+        </div>
+        <div className="flex shrink-0 rounded-lg border border-slate-200 dark:border-white/5 overflow-hidden text-xs font-semibold">
+          <button
+            type="button"
+            onClick={() => setHasToll(false)}
+            className={`px-3 py-2 transition-colors ${
+              !hasToll
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-50 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-100 dark:hover:bg-neutral-700'
+            }`}
+          >
+            No Toll
+          </button>
+          <button
+            type="button"
+            onClick={() => setHasToll(true)}
+            className={`px-3 py-2 transition-colors border-l border-slate-200 dark:border-white/5 ${
+              hasToll
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-50 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-100 dark:hover:bg-neutral-700'
+            }`}
+          >
+            Toll
+          </button>
+        </div>
+      </div>
+
+      {hasToll && (
+        <div className="flex items-center justify-between gap-4">
+          {autoToll !== null && !tollOverridden ? (
+            <div className="flex items-center gap-2 ml-auto">
+              <span className="text-xs text-slate-500 dark:text-neutral-400">Auto-detected</span>
+              <span className="text-sm font-semibold text-slate-900 dark:text-white">RM {autoToll.toFixed(2)}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setToll(String(autoToll))
+                  setTollOverridden(true)
+                }}
+                className="text-xs text-blue-600 dark:text-blue-400 underline underline-offset-2"
+              >
+                Edit
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 ml-auto">
+              {autoToll === null && (
+                <p className="text-xs text-slate-500 dark:text-neutral-400">No data for this route</p>
+              )}
+              <input
+                type="number"
+                inputMode="decimal"
+                min="0"
+                step="0.10"
+                value={toll}
+                onChange={e => setToll(e.target.value)}
+                placeholder="0.00"
+                className="w-24 appearance-none text-center bg-slate-50 dark:bg-neutral-800 border border-slate-200 dark:border-white/5 rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 dark:text-white placeholder:text-center placeholder:font-normal placeholder:text-slate-400 dark:placeholder:text-neutral-600 shadow-sm shadow-slate-200/60 dark:shadow-none focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400"
+              />
+              <span className="text-xs text-center text-slate-600 dark:text-neutral-600 w-16">RM</span>
+            </div>
+          )}
+        </div>
       )}
     </div>
   )
