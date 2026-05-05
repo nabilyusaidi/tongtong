@@ -27,7 +27,12 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
   const parsedConsumption = CAR_PRESETS[carType].consumption
   const parsedDistance = parseFloat(distance)
   const parsedToll = parseFloat(toll) || 0
-  const effectiveToll = hasToll ? (tollOverridden ? parsedToll : (autoToll ?? parsedToll)) : 0
+  function getEffectiveToll() {
+    if (!hasToll) return 0
+    if (tollOverridden) return parsedToll
+    return autoToll ?? parsedToll
+  }
+  const effectiveToll = getEffectiveToll()
   const parsedPassengers = Number(passengers)
   const passengerError = getPassengerError(passengers, parsedPassengers)
   const hasValidPassengers = passengers !== '' && !passengerError
