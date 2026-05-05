@@ -407,6 +407,7 @@ function TollSection({ hasToll, setHasToll, autoToll, tollOverridden, setTollOve
                 inputMode="decimal"
                 min="0"
                 step="0.10"
+                aria-label="Toll amount in RM"
                 value={toll}
                 onChange={e => setToll(e.target.value)}
                 placeholder="0.00"
