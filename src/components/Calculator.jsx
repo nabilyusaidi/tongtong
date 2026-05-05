@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { calculateTrip } from '../lib/calculator'
+import { useMapsLoader, computeRoute } from '../lib/maps'
+import { lookupToll } from '../lib/tolls'
 
 const CAR_PRESETS = {
   hatchback: { label: 'Hatchback', consumption: 6.5 },
@@ -17,11 +19,15 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
   const [distance, setDistance] = useState('')
   const [toll, setToll] = useState('')
   const [passengers, setPassengers] = useState('2')
+  const [autoToll, setAutoToll] = useState(null)
+  const [hasToll, setHasToll] = useState(false)
+  const [tollOverridden, setTollOverridden] = useState(false)
 
   const fuelPrice = useMarketRate && marketPrice !== null ? marketPrice : budi95Price
   const parsedConsumption = CAR_PRESETS[carType].consumption
   const parsedDistance = parseFloat(distance)
   const parsedToll = parseFloat(toll) || 0
+  const effectiveToll = hasToll ? (tollOverridden ? parsedToll : (autoToll ?? parsedToll)) : 0
   const parsedPassengers = Number(passengers)
   const passengerError = getPassengerError(passengers, parsedPassengers)
   const hasValidPassengers = passengers !== '' && !passengerError
@@ -34,12 +40,12 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
           fuelPrice,
           consumption: parsedConsumption,
           distance: parsedDistance,
-          toll: parsedToll,
+          toll: effectiveToll,
           passengers: parsedPassengers,
           isReturn: false,
         })
       : null
-  ), [hasValidInputs, fuelPrice, parsedConsumption, parsedDistance, parsedToll, parsedPassengers])
+  ), [hasValidInputs, fuelPrice, parsedConsumption, parsedDistance, effectiveToll, parsedPassengers])
 
   useEffect(() => {
     onResultChange?.(result)
@@ -68,6 +74,8 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
     <div className="flex flex-col h-full space-y-3">
       <Section label="Trip details">
         <div className="space-y-1">
+          <CarTypeSelector value={carType} onChange={setCarType} />
+          <Divider />
           <FuelPriceRow
             budi95Price={budi95Price}
             marketPrice={marketPrice}
@@ -76,17 +84,14 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
             priceDate={priceDate}
           />
           <Divider />
-          <CarTypeSelector value={carType} onChange={setCarType} />
-          <Divider />
-          <Field
-            label="Distance"
-            required
-            description={<>Enter total distance. Double it<br />for return trips.</>}
-            unit="km"
+          <PlacesDistanceField
             value={distance}
             onChange={setDistance}
-            placeholder="30"
-            step="1"
+            onRouteResolved={routeLegs => {
+              const found = lookupToll(routeLegs)
+              setAutoToll(found)
+              setTollOverridden(false)
+            }}
           />
           <Divider />
           <Field
@@ -171,6 +176,121 @@ function CarTypeSelector({ value, onChange }) {
           </button>
         ))}
       </div>
+    </div>
+  )
+}
+
+function PlacesDistanceField({ value, onChange, onRouteResolved }) {
+  const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+  const { google, loading, error } = useMapsLoader()
+
+  if (!key || error) {
+    return (
+      <Field
+        label="Distance"
+        required
+        description={<>Enter total distance. Double it<br />for return trips.</>}
+        unit="km"
+        value={value}
+        onChange={onChange}
+        placeholder="30"
+        step="1"
+      />
+    )
+  }
+
+  return <PlacesFields google={google} loading={loading} onChange={onChange} onRouteResolved={onRouteResolved} />
+}
+
+function PlacesFields({ google, loading, onChange, onRouteResolved }) {
+  const fromContainerRef = useRef(null)
+  const toContainerRef = useRef(null)
+  const [fromLoc, setFromLoc] = useState(null)
+  const [toLoc, setToLoc] = useState(null)
+  const [resolvedKm, setResolvedKm] = useState(null)
+  const onChangeRef = useRef(onChange)
+
+  useEffect(() => { onChangeRef.current = onChange }, [onChange])
+
+  useEffect(() => {
+    if (!google || !fromContainerRef.current) return
+    const container = fromContainerRef.current
+    const el = new google.maps.places.PlaceAutocompleteElement({
+      componentRestrictions: { country: 'MY' },
+    })
+    container.appendChild(el)
+    el.addEventListener('gmp-select', async ({ placePrediction }) => {
+      const place = placePrediction.toPlace()
+      await place.fetchFields({ fields: ['location'] })
+      setFromLoc(place.location ?? null)
+    })
+    el.addEventListener('input', () => {
+      setFromLoc(null)
+      setResolvedKm(null)
+      onChangeRef.current('')
+      onRouteResolved?.(null)
+    })
+    return () => { if (container.contains(el)) container.removeChild(el) }
+  }, [google])
+
+  useEffect(() => {
+    if (!google || !toContainerRef.current) return
+    const container = toContainerRef.current
+    const el = new google.maps.places.PlaceAutocompleteElement({
+      componentRestrictions: { country: 'MY' },
+    })
+    container.appendChild(el)
+    el.addEventListener('gmp-select', async ({ placePrediction }) => {
+      const place = placePrediction.toPlace()
+      await place.fetchFields({ fields: ['location'] })
+      setToLoc(place.location ?? null)
+    })
+    el.addEventListener('input', () => {
+      setToLoc(null)
+      setResolvedKm(null)
+      onChangeRef.current('')
+      onRouteResolved?.(null)
+    })
+    return () => { if (container.contains(el)) container.removeChild(el) }
+  }, [google])
+
+  useEffect(() => {
+    if (!fromLoc || !toLoc) return
+    computeRoute(fromLoc, toLoc)
+      .then(({ distanceKm, routeLegs }) => {
+        setResolvedKm(distanceKm)
+        onChangeRef.current(String(distanceKm))
+        onRouteResolved?.(routeLegs)
+      })
+      .catch(() => {
+        setResolvedKm(null)
+        onChangeRef.current('')
+        onRouteResolved?.(null)
+      })
+  }, [fromLoc, toLoc])
+
+  return (
+    <div className="py-1 space-y-2">
+      <div>
+        <p className="text-sm font-semibold text-slate-900 dark:text-white">
+          Distance
+          {!resolvedKm && <span className="ml-1 text-red-500 dark:text-red-400">*</span>}
+        </p>
+        <p className="text-xs text-slate-600 dark:text-neutral-400">
+          {resolvedKm ? `${resolvedKm} km driving` : 'Select from and to in Malaysia'}
+        </p>
+      </div>
+      {loading ? (
+        <div className="space-y-1.5">
+          <div className="h-9 rounded-lg bg-slate-100 dark:bg-neutral-800 animate-pulse" />
+          <div className="h-9 rounded-lg bg-slate-100 dark:bg-neutral-800 animate-pulse" />
+        </div>
+      ) : (
+        <div className="space-y-1.5">
+          <div ref={fromContainerRef} />
+          <div ref={toContainerRef} />
+        </div>
+      )}
     </div>
   )
 }
