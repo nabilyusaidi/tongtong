@@ -5,24 +5,27 @@ input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; }
 
-gmp-place-autocomplete {
-  width: 100%;
-  --gmp-mat-color-on-surface: #0f172a;
-  --gmp-mat-color-on-surface-variant: #64748b;
-  --gmp-mat-color-surface-container-high: #f8fafc;
-  --gmp-mat-color-surface-container-highest: #f1f5f9;
-  --gmp-mat-color-outline: #e2e8f0;
-  --gmp-mat-color-primary: #2563eb;
-  border-radius: 0.5rem;
-}
+gmp-place-autocomplete { width: 100%; color-scheme: light; }
+.dark gmp-place-autocomplete { color-scheme: dark; }
 
-.dark gmp-place-autocomplete {
-  --gmp-mat-color-on-surface: #ffffff;
-  --gmp-mat-color-on-surface-variant: #a3a3a3;
-  --gmp-mat-color-surface-container-high: #262626;
-  --gmp-mat-color-surface-container-highest: #1a1a1a;
-  --gmp-mat-color-outline: rgba(255,255,255,0.05);
-  --gmp-mat-color-primary: #60a5fa;
+/* Force light-mode surface colours from outside the closed shadow DOM */
+.autocomplete-wrap { position: relative; border-radius: 0.5rem; overflow: hidden; }
+.autocomplete-wrap gmp-place-autocomplete { display: block; }
+
+/* Override the web component's inline background by layering our own behind it */
+.autocomplete-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  pointer-events: none;
+  z-index: 0;
+}
+.dark .autocomplete-wrap::before {
+  background: #262626;
+  border-color: rgba(255,255,255,0.05);
 }
 
 @keyframes draw {

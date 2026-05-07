@@ -209,6 +209,7 @@ function PlacesDistanceField({ value, onChange, onRouteResolved }) {
   return <PlacesFields google={google} loading={loading} onChange={onChange} onRouteResolved={onRouteResolved} />
 }
 
+
 function PlacesFields({ google, loading, onChange, onRouteResolved }) {
   const fromContainerRef = useRef(null)
   const toContainerRef = useRef(null)
@@ -294,8 +295,12 @@ function PlacesFields({ google, loading, onChange, onRouteResolved }) {
         </div>
       ) : (
         <div className="space-y-1.5">
-          <div ref={fromContainerRef} />
-          <div ref={toContainerRef} />
+          <div className="autocomplete-wrap">
+            <div ref={fromContainerRef} />
+          </div>
+          <div className="autocomplete-wrap">
+            <div ref={toContainerRef} />
+          </div>
         </div>
       )}
     </div>
