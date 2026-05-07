@@ -10,10 +10,14 @@ A lightweight, client-side car ride cost calculator for Malaysian drivers and pa
 
 ## What it does
 
-Enter your fuel price, fuel consumption, trip distance, and toll. TongTong calculates exactly how much each person chips in.
+Enter your trip details and TongTong calculates exactly how much each person chips in for fuel and toll.
 
-- Supports km/L and L/100km fuel consumption units
-- Fully offline-capable. No network requests
+- **Car type presets** — choose Hatchback, Sedan, SUV, or MPV. Each has a typical L/100km consumption value used for the fuel cost estimate (6.5 / 7.5 / 9.5 / 11.0)
+- **Live fuel price** — fetched on load from [data.gov.my](https://data.gov.my) (OpenDOSM). Defaults to BUDI RON95 subsidised rate; toggle to unsubsidised market rate
+- **Distance autocomplete** — [Google Places API](https://developers.google.com/maps/documentation/places/web-service) for location search restricted to Malaysia, then [Google Routes API](https://developers.google.com/maps/documentation/routes) (DRIVE mode) for the actual driving distance
+- **Toll auto-detection** — reads highway names from the Routes API response to identify which toll roads you'll use and fills in the fare automatically — see [docs/tolls.md](docs/tolls.md)
+- **Return trip** — toggle doubles both distance and toll
+- Fully client-side. No backend, no accounts, no data stored
 
 ---
 
@@ -48,16 +52,17 @@ tongtong/
 ├── src/
 │   ├── components/
 │   │   ├── Calculator.jsx
-│   │   ├── Explanation.jsx
-│   │   ├── Guide.jsx
-│   │   ├── PassengerChips.jsx
-│   │   └── ResultCard.jsx
+│   │   └── PlacesInput.jsx
 │   ├── lib/
-│   │   └── calculator.js
+│   │   ├── calculator.js
+│   │   ├── maps.js
+│   │   ├── places.js
+│   │   └── tolls.js
 │   ├── App.jsx
 │   └── main.jsx
 └── docs/
-    └── architecture.md
+    ├── architecture.md
+    └── tolls.md
 ```
 
 ---

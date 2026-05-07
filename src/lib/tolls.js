@@ -19,6 +19,8 @@ export const CORRIDORS = [
   { id: 'karak',        label: 'Karak/Genting', highways: ['Lebuhraya Karak'],                 oneWayToll: 5.70 },
   // Penang Bridge — verified 2026-05-07: "Jambatan Pulau Pinang/E36" in NAME_CHANGE step
   { id: 'penang_bridge', label: 'Penang Bridge', highways: ['Jambatan Pulau Pinang'],          oneWayToll: 7.00 },
+  // Sungai Besi (E9) — verified 2026-05-08: "Belok kiri ke Lebuhraya Sungai Besi/E9" in TURN_LEFT step
+  { id: 'sungai_besi',  label: 'Sungai Besi',   highways: ['Lebuhraya Sungai Besi'],           oneWayToll: 1.50 },
 ]
 
 // Closed tolls — distance-based fare, cannot be auto-calculated; prompt user to enter manually
@@ -28,14 +30,14 @@ const CLOSED_TOLL_HIGHWAYS = [
   // Note: both share the same match string pattern; one entry covers both
   { id: 'plus',  label: 'PLUS',  highways: ['Lebuhraya Utara - Selatan'] },
   { id: 'plus2', label: 'PLUS',  highways: ['Lebuhraya Utara-Selatan'] },
-  // ELITE (E6) — match string unverified, needs real KL→Nilai/KLIA route log
-  { id: 'elite', label: 'ELITE', highways: ['Lebuhraya Utara-Selatan Hubungan Tengah'] },
-  // LPT East Coast Expressway — match string unverified, needs real KL→Kuantan route log
-  { id: 'lpt',   label: 'LPT',   highways: ['Lebuhraya Pantai Timur'] },
-  // SKVE (E26) — match string unverified, needs real Klang→Putrajaya route log
-  { id: 'skve',  label: 'SKVE',  highways: ['Lebuhraya SKVE'] },
-  // SDE (E22) — match string unverified, needs real JB→Desaru route log
-  { id: 'sde',   label: 'SDE',   highways: ['Lebuhraya Senai - Desaru'] },
+  // ELITE (E6) — verified 2026-05-08: "Susur ke KLIA Expressway/.../Lebuhraya Putrajaya-Dengkil-KLIA/Laluan 26/E6" in MERGE step (KL→Nilai route)
+  { id: 'elite', label: 'ELITE', highways: ['Lebuhraya Putrajaya-Dengkil-KLIA'] },
+  // LPT East Coast Expressway (E8) — verified 2026-05-08: "tanjakan E8 ke Kuantan" in RAMP step, "Teruskan perjalanan ke AH141" in STRAIGHT step (KL→Kuantan route)
+  { id: 'lpt',   label: 'LPT',   highways: ['AH141'] },
+  // SDE (E22) — verified 2026-05-08: "Susur ke Lebuhraya Senai-Desaru/E22" in MERGE step (JB→Desaru route)
+  { id: 'sde',   label: 'SDE',   highways: ['Lebuhraya Senai-Desaru'] },
+  // BKE (E15) — verified 2026-05-08: "Belok kiri ke Lebuhraya Butterworth - Kulim/E15" in TURN_LEFT step (Butterworth→Kulim route)
+  { id: 'bke',   label: 'BKE',   highways: ['Lebuhraya Butterworth - Kulim'] },
 ]
 
 function isOnHighway(step, highwayName) {

@@ -25,6 +25,7 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
   const [needsManualToll, setNeedsManualToll] = useState(false)
   const [hasToll, setHasToll] = useState(false)
   const [tollOverridden, setTollOverridden] = useState(false)
+  const [isReturn, setIsReturn] = useState(false)
 
   const fuelPrice = useMarketRate && marketPrice !== null ? marketPrice : budi95Price
   const parsedConsumption = CAR_PRESETS[carType].consumption
@@ -50,10 +51,10 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
           distance: parsedDistance,
           toll: effectiveToll,
           passengers: parsedPassengers,
-          isReturn: false,
+          isReturn,
         })
       : null
-  ), [hasValidInputs, fuelPrice, parsedConsumption, parsedDistance, effectiveToll, parsedPassengers])
+  ), [hasValidInputs, fuelPrice, parsedConsumption, parsedDistance, effectiveToll, parsedPassengers, isReturn])
 
   useEffect(() => {
     onResultChange?.(result)
@@ -95,6 +96,7 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
           <PlacesDistanceField
             value={distance}
             onChange={setDistance}
+            onReturnChange={setIsReturn}
             onRouteResolved={routeLegs => {
               const found = lookupToll(routeLegs)
               setAutoToll(found?.toll ?? null)
@@ -115,6 +117,7 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
             setTollOverridden={setTollOverridden}
             toll={toll}
             setToll={setToll}
+            isReturn={isReturn}
           />
         </div>
       </Section>
@@ -192,7 +195,7 @@ function CarTypeSelector({ value, onChange }) {
   )
 }
 
-function PlacesDistanceField({ value, onChange, onRouteResolved }) {
+function PlacesDistanceField({ value, onChange, onReturnChange, onRouteResolved }) {
   const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
   if (!key) {
@@ -210,10 +213,10 @@ function PlacesDistanceField({ value, onChange, onRouteResolved }) {
     )
   }
 
-  return <PlacesFields onChange={onChange} onRouteResolved={onRouteResolved} />
+  return <PlacesFields onChange={onChange} onReturnChange={onReturnChange} onRouteResolved={onRouteResolved} />
 }
 
-function PlacesFields({ onChange, onRouteResolved }) {
+function PlacesFields({ onChange, onReturnChange, onRouteResolved }) {
   const [fromLoc, setFromLoc] = useState(null)
   const [toLoc, setToLoc] = useState(null)
   const [resolvedKm, setResolvedKm] = useState(null)
@@ -229,7 +232,7 @@ function PlacesFields({ onChange, onRouteResolved }) {
     computeRoute(fromLoc, toLoc)
       .then(({ distanceKm, routeLegs }) => {
         setResolvedKm(distanceKm)
-        onChangeRef.current(String(isReturn ? distanceKm * 2 : distanceKm))
+        onChangeRef.current(String(distanceKm))
         onRouteResolved?.(routeLegs)
       })
       .catch(() => {
@@ -240,8 +243,7 @@ function PlacesFields({ onChange, onRouteResolved }) {
   }, [fromLoc, toLoc])
 
   useEffect(() => {
-    if (!resolvedKm) return
-    onChangeRef.current(String(isReturn ? resolvedKm * 2 : resolvedKm))
+    onReturnChange?.(isReturn)
   }, [isReturn])
 
   function clearRoute() {
@@ -355,7 +357,9 @@ function FuelPriceRow({ budi95Price, marketPrice, useMarketRate, setUseMarketRat
   )
 }
 
-function TollSection({ hasToll, setHasToll, autoToll, autoTollLabel, needsManualToll, tollOverridden, setTollOverridden, toll, setToll }) {
+function TollSection({ hasToll, setHasToll, autoToll, autoTollLabel, needsManualToll, tollOverridden, setTollOverridden, toll, setToll, isReturn }) {
+  const displayToll = autoToll !== null ? (isReturn ? autoToll * 2 : autoToll) : null
+
   return (
     <div className="py-1 space-y-2">
       <div className="flex items-center justify-between gap-4">
@@ -364,6 +368,8 @@ function TollSection({ hasToll, setHasToll, autoToll, autoTollLabel, needsManual
           <p className="text-xs text-slate-600 dark:text-neutral-400">
             {needsManualToll
               ? `${autoTollLabel} detected — enter your toll`
+              : isReturn
+              ? 'Return trip — toll doubled.'
               : 'Double it for return trips.'}
           </p>
         </div>
@@ -400,7 +406,7 @@ function TollSection({ hasToll, setHasToll, autoToll, autoTollLabel, needsManual
               <div className="text-right">
                 <p className="text-xs text-slate-500 dark:text-neutral-400">{autoTollLabel}</p>
               </div>
-              <span className="text-sm font-semibold text-slate-900 dark:text-white shrink-0">RM {autoToll.toFixed(2)}</span>
+              <span className="text-sm font-semibold text-slate-900 dark:text-white shrink-0">RM {displayToll.toFixed(2)}</span>
               <button
                 type="button"
                 onClick={() => {

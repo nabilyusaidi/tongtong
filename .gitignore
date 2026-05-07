@@ -10,3 +10,4 @@ node_modules/
 # Docs
 docs/*
 !docs/architecture.md
+!docs/tolls.md

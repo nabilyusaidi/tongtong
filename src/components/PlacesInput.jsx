@@ -9,8 +9,10 @@ export default function PlacesInput({ placeholder, onSelect, onClear, imperative
   const [suggestions, setSuggestions] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(-1)
   const hasSelected = useRef(false)
   const debounceTimer = useRef(null)
+  const listRef = useRef(null)
 
   if (imperativeRef) {
     imperativeRef.current = {
@@ -35,6 +37,7 @@ export default function PlacesInput({ placeholder, onSelect, onClear, imperative
         const results = await fetchSuggestions(query)
         setSuggestions(results)
         setIsOpen(results.length > 0)
+        setActiveIndex(-1)
       } catch {
         setSuggestions([])
         setIsOpen(false)
@@ -45,6 +48,31 @@ export default function PlacesInput({ placeholder, onSelect, onClear, imperative
 
     return () => clearTimeout(debounceTimer.current)
   }, [query])
+
+  function handleKeyDown(e) {
+    if (!isOpen || suggestions.length === 0) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActiveIndex(i => {
+        const next = Math.min(i + 1, suggestions.length - 1)
+        listRef.current?.children[next]?.scrollIntoView({ block: 'nearest' })
+        return next
+      })
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIndex(i => {
+        const next = Math.max(i - 1, 0)
+        listRef.current?.children[next]?.scrollIntoView({ block: 'nearest' })
+        return next
+      })
+    } else if (e.key === 'Enter' && activeIndex >= 0) {
+      e.preventDefault()
+      handleSelect(suggestions[activeIndex])
+    } else if (e.key === 'Escape') {
+      setIsOpen(false)
+      setActiveIndex(-1)
+    }
+  }
 
   function handleChange(e) {
     if (hasSelected.current) {
@@ -82,6 +110,7 @@ export default function PlacesInput({ placeholder, onSelect, onClear, imperative
         onChange={handleChange}
         onBlur={handleBlur}
         onFocus={() => { if (suggestions.length > 0) setIsOpen(true) }}
+        onKeyDown={handleKeyDown}
         className={INPUT_CLASS + (onSwap ? ' pr-9' : ' pr-3') + (isLoading ? ' opacity-70' : '')}
         autoComplete="off"
       />
@@ -99,12 +128,16 @@ export default function PlacesInput({ placeholder, onSelect, onClear, imperative
         </button>
       )}
       {isOpen && suggestions.length > 0 && (
-        <ul className="absolute z-50 left-0 right-0 mt-1 rounded-lg border border-slate-200 bg-white shadow-lg overflow-hidden dark:bg-neutral-900 dark:border-white/10">
-          {suggestions.map(suggestion => (
+        <ul ref={listRef} className="absolute z-50 left-0 right-0 mt-1 rounded-lg border border-slate-200 bg-white shadow-lg overflow-hidden dark:bg-neutral-900 dark:border-white/10">
+          {suggestions.map((suggestion, i) => (
             <li
               key={suggestion.placeId}
               onMouseDown={() => handleSelect(suggestion)}
-              className="px-3 py-2 text-sm text-slate-800 dark:text-neutral-200 cursor-pointer hover:bg-slate-100 dark:hover:bg-neutral-800 truncate"
+              className={`px-3 py-2 text-sm text-slate-800 dark:text-neutral-200 cursor-pointer truncate ${
+                i === activeIndex
+                  ? 'bg-slate-100 dark:bg-neutral-800'
+                  : 'hover:bg-slate-100 dark:hover:bg-neutral-800'
+              }`}
             >
               {suggestion.text}
             </li>
