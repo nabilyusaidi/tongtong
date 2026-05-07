@@ -5,7 +5,25 @@ input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; }
 
-gmp-place-autocomplete { width: 100%; }
+gmp-place-autocomplete {
+  width: 100%;
+  --gmp-mat-color-on-surface: #0f172a;
+  --gmp-mat-color-on-surface-variant: #64748b;
+  --gmp-mat-color-surface-container-high: #f8fafc;
+  --gmp-mat-color-surface-container-highest: #f1f5f9;
+  --gmp-mat-color-outline: #e2e8f0;
+  --gmp-mat-color-primary: #2563eb;
+  border-radius: 0.5rem;
+}
+
+.dark gmp-place-autocomplete {
+  --gmp-mat-color-on-surface: #ffffff;
+  --gmp-mat-color-on-surface-variant: #a3a3a3;
+  --gmp-mat-color-surface-container-high: #262626;
+  --gmp-mat-color-surface-container-highest: #1a1a1a;
+  --gmp-mat-color-outline: rgba(255,255,255,0.05);
+  --gmp-mat-color-primary: #60a5fa;
+}
 
 @keyframes draw {
   from { stroke-dashoffset: 300; }
