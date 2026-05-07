@@ -1,4 +1,3 @@
-// src/lib/places.js
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
 export async function fetchSuggestions(query) {
@@ -16,9 +15,10 @@ export async function fetchSuggestions(query) {
   })
   if (!res.ok) throw new Error(`Places autocomplete ${res.status}`)
   const data = await res.json()
-  return (data.suggestions ?? []).map(s => ({
-    placeId: s.placePrediction.placeId,
-    text: s.placePrediction.text.text,
+  return (data.suggestions ?? []).map(suggestion => ({
+    placeId: suggestion.placePrediction.placeId,
+    // .text is TextWithMatchRanges; .text.text is the plain string
+    text: suggestion.placePrediction.text.text,
   }))
 }
 
