@@ -22,6 +22,7 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
   const [passengers, setPassengers] = useState('2')
   const [autoToll, setAutoToll] = useState(null)
   const [autoTollLabel, setAutoTollLabel] = useState(null)
+  const [needsManualToll, setNeedsManualToll] = useState(false)
   const [hasToll, setHasToll] = useState(false)
   const [tollOverridden, setTollOverridden] = useState(false)
 
@@ -96,8 +97,10 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
             onChange={setDistance}
             onRouteResolved={routeLegs => {
               const found = lookupToll(routeLegs)
-              setAutoToll(found ? found.toll : null)
-              setAutoTollLabel(found ? found.label : null)
+              setAutoToll(found?.toll ?? null)
+              setAutoTollLabel(found?.label ?? null)
+              setNeedsManualToll(found?.needsManualToll ?? false)
+              if (found) setHasToll(true)
               setTollOverridden(false)
             }}
           />
@@ -107,6 +110,7 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
             setHasToll={setHasToll}
             autoToll={autoToll}
             autoTollLabel={autoTollLabel}
+            needsManualToll={needsManualToll}
             tollOverridden={tollOverridden}
             setTollOverridden={setTollOverridden}
             toll={toll}
@@ -351,13 +355,17 @@ function FuelPriceRow({ budi95Price, marketPrice, useMarketRate, setUseMarketRat
   )
 }
 
-function TollSection({ hasToll, setHasToll, autoToll, autoTollLabel, tollOverridden, setTollOverridden, toll, setToll }) {
+function TollSection({ hasToll, setHasToll, autoToll, autoTollLabel, needsManualToll, tollOverridden, setTollOverridden, toll, setToll }) {
   return (
     <div className="py-1 space-y-2">
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-sm font-semibold text-slate-900 dark:text-white">Toll</p>
-          <p className="text-xs text-slate-600 dark:text-neutral-400">Double it for return trips.</p>
+          <p className="text-xs text-slate-600 dark:text-neutral-400">
+            {needsManualToll
+              ? `${autoTollLabel} detected — enter your toll`
+              : 'Double it for return trips.'}
+          </p>
         </div>
         <div className="flex shrink-0 rounded-lg border border-slate-200 dark:border-white/5 overflow-hidden text-xs font-semibold">
           <button
@@ -407,7 +415,9 @@ function TollSection({ hasToll, setHasToll, autoToll, autoTollLabel, tollOverrid
           ) : (
             <div className="flex items-center gap-2 ml-auto justify-end">
               {autoToll === null ? (
-                <p className="text-xs text-slate-500 dark:text-neutral-400">No data for this route</p>
+                <p className="text-xs text-slate-500 dark:text-neutral-400">
+                  {needsManualToll ? `Check your ${autoTollLabel} receipt` : 'No data for this route'}
+                </p>
               ) : (
                 <button
                   type="button"

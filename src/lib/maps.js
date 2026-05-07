@@ -18,9 +18,10 @@ export async function computeRoute(origin, destination) {
     body: JSON.stringify(body),
   })
 
+  const data = await res.json()
+
   if (!res.ok) throw new Error(`Routes API ${res.status}`)
 
-  const data = await res.json()
   const route = data.routes?.[0]
   if (!route) throw new Error('No route returned')
 
