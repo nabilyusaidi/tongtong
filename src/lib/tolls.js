@@ -1,36 +1,54 @@
 export const CORRIDORS = [
-  // Klang Valley
-  { id: 'ldp',      label: 'LDP',            highways: ['Lebuhraya Damansara-Puchong', 'LDP'],                         oneWayToll: 2.00 },
-  { id: 'sprint',   label: 'SPRINT',          highways: ['Sistem Penyuraian Trafik KL Barat', 'SPRINT'],                oneWayToll: 1.50 },
-  { id: 'kesas',    label: 'KESAS',           highways: ['Kemuning-Shah Alam', 'KESAS'],                                oneWayToll: 1.60 },
-  { id: 'nkve',     label: 'NKVE',            highways: ['New Klang Valley Expressway', 'NKVE'],                        oneWayToll: 2.50 },
-  { id: 'duke',     label: 'DUKE',            highways: ['Duta-Ulu Kelang Expressway', 'DUKE'],                         oneWayToll: 2.00 },
-  { id: 'akleh',    label: 'AKLEH',           highways: ['Ampang-KL Elevated Highway', 'AKLEH'],                        oneWayToll: 1.50 },
-  { id: 'federal',  label: 'Federal Highway', highways: ['Federal Highway', 'Lebuhraya Persekutuan'],                   oneWayToll: 0.50 },
-  // PLUS intercity
-  { id: 'kl-seremban', label: 'KL–Seremban',  highways: ['E2', 'PLUS South'],                                          oneWayToll: 6.20  },
-  { id: 'kl-ipoh',     label: 'KL–Ipoh',      highways: ['E1', 'North-South Expressway'],                              oneWayToll: 13.40 },
-  { id: 'kl-penang',   label: 'KL–Penang',    highways: ['E1', 'North-South Expressway', 'Penang Bridge'],             oneWayToll: 23.80 },
-  { id: 'kl-jb',       label: 'KL–JB',        highways: ['E2', 'E1', 'North-South Expressway'],                       oneWayToll: 23.50 },
-  { id: 'kl-karak',    label: 'KL–Karak',     highways: ['E8', 'Karak Highway', 'Lebuhraya Karak'],                   oneWayToll: 5.70  },
+  // Klang Valley — verified against Google Routes API Malay instruction text
+  { id: 'ldp',     label: 'LDP',            highways: ['E11'],                                          oneWayToll: 2.00 },
+  { id: 'sprint',  label: 'SPRINT',          highways: ['Lebuhraya SPRINT', 'E23'],                      oneWayToll: 1.50 },
+  { id: 'kesas',   label: 'KESAS',           highways: ['Lbh Kemuning - Shah Alam', 'E13'],              oneWayToll: 1.60 },
+  { id: 'duke',    label: 'DUKE',            highways: ['Lebuhraya Duta - Ulu Kelang', 'E33'],           oneWayToll: 2.00 },
+  { id: 'akleh',   label: 'AKLEH',           highways: ['E12'],                                              oneWayToll: 1.50 },
+  { id: 'federal', label: 'Federal Highway', highways: ['Lebuhraya Persekutuan'],                        oneWayToll: 0.50 },
+  { id: 'smart',   label: 'SMART',            highways: ['Lebuhraya SMART'],                              oneWayToll: 2.00 },
+  // Karak/Genting — verified: uses "Lebuhraya Karak/AH141" in instruction text
+  { id: 'karak',   label: 'Karak/Genting',   highways: ['Lebuhraya Karak'],                              oneWayToll: 5.70 },
 ]
+
+function isOnHighway(step, highwayName) {
+  const instruction = step.navigationInstruction?.instructions ?? ''
+  const maneuver = step.navigationInstruction?.maneuver ?? ''
+
+  if (!instruction.includes(highwayName)) return false
+
+  // Most reliable: you are now on this road
+  if (['NAME_CHANGE', 'MERGE'].includes(maneuver)) return true
+
+  // Signage language — car is NOT on this road, just following signs
+  if (instruction.includes('papan tanda')) return false
+  if (instruction.includes('ke arah')) return false
+
+  // RAMP steps are entrance/exit moves — never the road itself
+  if (maneuver.startsWith('RAMP_')) return false
+
+  // DEPART, STRAIGHT, TURN_* with no signage language — trust it
+  return true
+}
 
 export function lookupToll(routeLegs) {
   if (!routeLegs || routeLegs.length === 0) return null
 
-  const names = new Set()
-  for (const leg of routeLegs) {
-    for (const step of (leg.steps ?? [])) {
-      const text = step.navigationInstruction?.instructions ?? ''
-      if (text) names.add(text)
-    }
+  // Collect all steps across all legs
+  const allSteps = routeLegs.flatMap(leg => leg.steps ?? [])
+
+  const matched = []
+  for (const corridor of CORRIDORS) {
+    // Every highway in the corridor must have at least one step confirming travel on it
+    const onCorridor = corridor.highways.every(highwayName =>
+      allSteps.some(step => isOnHighway(step, highwayName))
+    )
+    if (onCorridor) matched.push(corridor)
   }
 
-  const nameStr = [...names].join(' ')
-  for (const corridor of CORRIDORS) {
-    if (corridor.highways.every(h => nameStr.includes(h))) {
-      return corridor.oneWayToll
-    }
-  }
-  return null
+  if (matched.length === 0) return null
+
+  const toll = matched.reduce((sum, c) => sum + c.oneWayToll, 0)
+  const label = matched.map(c => c.label).join(' + ')
+  return { toll, label }
 }

@@ -45,6 +45,7 @@ export async function computeRoute(origin, destination) {
     origin:      { location: { latLng: { latitude: origin.lat(),      longitude: origin.lng()      } } },
     destination: { location: { latLng: { latitude: destination.lat(), longitude: destination.lng() } } },
     travelMode: 'DRIVE',
+    regionCode: 'MY',
   }
 
   const res = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
@@ -52,7 +53,7 @@ export async function computeRoute(origin, destination) {
     headers: {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': key,
-      'X-Goog-FieldMask': 'routes.distanceMeters,routes.legs',
+      'X-Goog-FieldMask': 'routes.distanceMeters,routes.legs.steps.navigationInstruction',
     },
     body: JSON.stringify(body),
   })

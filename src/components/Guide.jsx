@@ -1,38 +1,23 @@
 const steps = [
   {
     n: 1,
-    title: 'Fuel Price',
-    body: (
-      <>
-        Check the price for RON95 or RON97 per litre
-        <sup>1</sup>
-      </>
-    ),
+    title: 'Car & fuel',
+    body: "Pick your car type. Fuel price is updated weekly.",
   },
   {
     n: 2,
-    title: 'Fuel Consumption',
-    body: "Find it in your car's trip meter. Take note on km/L OR L/100km.",
+    title: 'Trip details',
+    body: "Enter your From and To distance fills in automatically. Add toll if there is one.",
   },
   {
     n: 3,
-    title: 'Distance',
-    body: "Use Google Maps/Waze for the one-way distance. Going and coming back? Double it before entering.",
+    title: 'Passengers',
+    body: "Count everyone in the car, including the driver.",
   },
   {
     n: 4,
-    title: 'Toll',
-    body: "Remember the rates. Going and coming back? Double it too.",
-  },
-  {
-    n: 5,
-    title: 'Passengers',
-    body: "Count everyone riding, including the driver.",
-  },
-  {
-    n: 6,
-    title: 'Hit Calculate',
-    body: "Each person's fair share calculated. Share the number with your passengers.",
+    title: 'Calculate',
+    body: "See each person's fair share instantly.",
   },
 ]
 

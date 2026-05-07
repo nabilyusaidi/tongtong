@@ -12,7 +12,7 @@ const CAR_PRESETS = {
 
 export default function Calculator({ onResultChange, resultTargetRef }) {
   const [budi95Price, setBudi95Price] = useState(1.99)
-  const [marketPrice, setMarketPrice] = useState(null)
+  const [marketPrice, setMarketPrice] = useState(4.90)
   const [useMarketRate, setUseMarketRate] = useState(false)
   const [priceDate, setPriceDate] = useState(null)
   const [carType, setCarType] = useState('hatchback')
@@ -20,6 +20,7 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
   const [toll, setToll] = useState('')
   const [passengers, setPassengers] = useState('2')
   const [autoToll, setAutoToll] = useState(null)
+  const [autoTollLabel, setAutoTollLabel] = useState(null)
   const [hasToll, setHasToll] = useState(false)
   const [tollOverridden, setTollOverridden] = useState(false)
 
@@ -63,7 +64,7 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
         const row = data[0]
         if (!row) return
         if (row.ron95_budi95) setBudi95Price(row.ron95_budi95)
-        if (row.ron95) setMarketPrice(row.ron95)
+        if (row.ron97) setMarketPrice(row.ron97)
         if (row.date) setPriceDate(row.date)
       })
       .catch(() => {})
@@ -94,7 +95,8 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
             onChange={setDistance}
             onRouteResolved={routeLegs => {
               const found = lookupToll(routeLegs)
-              setAutoToll(found)
+              setAutoToll(found ? found.toll : null)
+              setAutoTollLabel(found ? found.label : null)
               setTollOverridden(false)
             }}
           />
@@ -103,6 +105,7 @@ export default function Calculator({ onResultChange, resultTargetRef }) {
             hasToll={hasToll}
             setHasToll={setHasToll}
             autoToll={autoToll}
+            autoTollLabel={autoTollLabel}
             tollOverridden={tollOverridden}
             setTollOverridden={setTollOverridden}
             toll={toll}
@@ -220,7 +223,7 @@ function PlacesFields({ google, loading, onChange, onRouteResolved }) {
     if (!google || !fromContainerRef.current) return
     const container = fromContainerRef.current
     const el = new google.maps.places.PlaceAutocompleteElement({
-      componentRestrictions: { country: 'MY' },
+      includedRegionCodes: ['my'],
     })
     container.appendChild(el)
     el.addEventListener('gmp-select', async ({ placePrediction }) => {
@@ -241,7 +244,7 @@ function PlacesFields({ google, loading, onChange, onRouteResolved }) {
     if (!google || !toContainerRef.current) return
     const container = toContainerRef.current
     const el = new google.maps.places.PlaceAutocompleteElement({
-      componentRestrictions: { country: 'MY' },
+      includedRegionCodes: ['my'],
     })
     container.appendChild(el)
     el.addEventListener('gmp-select', async ({ placePrediction }) => {
@@ -334,7 +337,7 @@ function FuelPriceRow({ budi95Price, marketPrice, useMarketRate, setUseMarketRat
                 : 'bg-slate-50 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-100 dark:hover:bg-neutral-700'
             }`}
           >
-            Market · RM{marketPrice.toFixed(2)}
+            RON 97 · RM{marketPrice.toFixed(2)}
           </button>
         </div>
       ) : (
@@ -346,7 +349,7 @@ function FuelPriceRow({ budi95Price, marketPrice, useMarketRate, setUseMarketRat
   )
 }
 
-function TollSection({ hasToll, setHasToll, autoToll, tollOverridden, setTollOverridden, toll, setToll }) {
+function TollSection({ hasToll, setHasToll, autoToll, autoTollLabel, tollOverridden, setTollOverridden, toll, setToll }) {
   return (
     <div className="py-1 space-y-2">
       <div className="flex items-center justify-between gap-4">
@@ -381,26 +384,36 @@ function TollSection({ hasToll, setHasToll, autoToll, tollOverridden, setTollOve
       </div>
 
       {hasToll && (
-        <div className="flex items-center justify-between gap-4">
+        <div className="space-y-1.5">
           {autoToll !== null && !tollOverridden ? (
-            <div className="flex items-center gap-2 ml-auto">
-              <span className="text-xs text-slate-500 dark:text-neutral-400">Auto-detected</span>
-              <span className="text-sm font-semibold text-slate-900 dark:text-white">RM {autoToll.toFixed(2)}</span>
+            <div className="flex items-center gap-2 ml-auto justify-end">
+              <div className="text-right">
+                <p className="text-xs text-slate-500 dark:text-neutral-400">{autoTollLabel}</p>
+              </div>
+              <span className="text-sm font-semibold text-slate-900 dark:text-white shrink-0">RM {autoToll.toFixed(2)}</span>
               <button
                 type="button"
                 onClick={() => {
                   setToll(String(autoToll))
                   setTollOverridden(true)
                 }}
-                className="text-xs text-blue-600 dark:text-blue-400 underline underline-offset-2"
+                className="text-xs text-blue-600 dark:text-blue-400 underline underline-offset-2 shrink-0"
               >
                 Edit
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2 ml-auto">
-              {autoToll === null && (
+            <div className="flex items-center gap-2 ml-auto justify-end">
+              {autoToll === null ? (
                 <p className="text-xs text-slate-500 dark:text-neutral-400">No data for this route</p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setTollOverridden(false)}
+                  className="text-xs text-blue-600 dark:text-blue-400 underline underline-offset-2"
+                >
+                  Auto Detect
+                </button>
               )}
               <input
                 type="number"
@@ -413,7 +426,7 @@ function TollSection({ hasToll, setHasToll, autoToll, tollOverridden, setTollOve
                 placeholder="0.00"
                 className="w-24 appearance-none text-center bg-slate-50 dark:bg-neutral-800 border border-slate-200 dark:border-white/5 rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 dark:text-white placeholder:text-center placeholder:font-normal placeholder:text-slate-400 dark:placeholder:text-neutral-600 shadow-sm shadow-slate-200/60 dark:shadow-none focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400"
               />
-              <span className="text-xs text-center text-slate-600 dark:text-neutral-600 w-16">RM</span>
+              <span className="text-xs text-center text-slate-600 dark:text-neutral-600 w-8">RM</span>
             </div>
           )}
         </div>

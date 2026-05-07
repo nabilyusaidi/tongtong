@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Local env (never commit API keys)
+.env.local
+
 #Build output
 /dist
 
