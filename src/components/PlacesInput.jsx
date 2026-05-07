@@ -3,13 +3,26 @@ import { fetchSuggestions, fetchLocation } from '../lib/places'
 
 const INPUT_CLASS = "w-full px-3 py-2 text-sm rounded-lg bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:bg-neutral-800 dark:border-white/5 dark:text-white dark:placeholder:text-neutral-500 dark:focus:ring-neutral-600"
 
-export default function PlacesInput({ placeholder, onSelect, onClear }) {
+// imperativeRef lets the parent inject a display text without triggering a new search (e.g. after swap)
+export default function PlacesInput({ placeholder, onSelect, onClear, imperativeRef }) {
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const hasSelected = useRef(false)
   const debounceTimer = useRef(null)
+
+  if (imperativeRef) {
+    imperativeRef.current = {
+      getText() { return query },
+      setText(text) {
+        hasSelected.current = true
+        setQuery(text)
+        setSuggestions([])
+        setIsOpen(false)
+      },
+    }
+  }
 
   useEffect(() => {
     if (hasSelected.current) return
