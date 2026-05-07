@@ -270,45 +270,33 @@ function PlacesFields({ onChange, onRouteResolved }) {
             {!resolvedKm && <span className="ml-1 text-red-500 dark:text-red-400">*</span>}
           </p>
           <p className="text-xs text-slate-600 dark:text-neutral-400">
-            {displayKm ? `${displayKm} km${isReturn ? ' (return)' : ' driving'}` : 'Select from and to in Malaysia'}
+            {displayKm ? `${displayKm} km${isReturn ? ' return' : ' driving'}` : 'Select from and to in Malaysia'}
           </p>
         </div>
-        {resolvedKm && (
-          <button
-            type="button"
-            onClick={() => setIsReturn(r => !r)}
-            className={`shrink-0 text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${
-              isReturn
-                ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white'
-                : 'bg-transparent text-slate-600 border-slate-200 dark:text-neutral-400 dark:border-white/10'
-            }`}
-          >
-            Return
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => setIsReturn(r => !r)}
+          className={`shrink-0 text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${
+            isReturn
+              ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white'
+              : 'bg-transparent text-slate-600 border-slate-200 dark:text-neutral-400 dark:border-white/10'
+          }`}
+        >
+          Return
+        </button>
       </div>
-      <div className="relative space-y-1.5">
+      <div className="space-y-1.5">
         <PlacesInput
           placeholder="From"
           onSelect={loc => { setFromLoc(loc); if (toLoc) clearRoute() }}
           onClear={() => { setFromLoc(null); clearRoute() }}
           imperativeRef={fromRef}
         />
-        <button
-          type="button"
-          onClick={swap}
-          aria-label="Swap from and to"
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 p-1 rounded-md text-slate-400 hover:text-slate-700 dark:text-neutral-500 dark:hover:text-neutral-200 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M7 16V4m0 0L3 8m4-4l4 4"/>
-            <path d="M17 8v12m0 0l4-4m-4 4l-4-4"/>
-          </svg>
-        </button>
         <PlacesInput
           placeholder="To"
           onSelect={loc => { setToLoc(loc); if (fromLoc) clearRoute() }}
           onClear={() => { setToLoc(null); clearRoute() }}
+          onSwap={swap}
           imperativeRef={toRef}
         />
       </div>
