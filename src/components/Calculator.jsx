@@ -230,6 +230,7 @@ function PlacesFields({ google, loading, onChange, onRouteResolved }) {
     el.addEventListener('gmp-select', async ({ placePrediction }) => {
       const place = placePrediction.toPlace()
       await place.fetchFields({ fields: ['location'] })
+      document.body.style.overflow = ''
       setFromLoc(place.location ?? null)
     })
     el.addEventListener('input', () => {
@@ -238,7 +239,12 @@ function PlacesFields({ google, loading, onChange, onRouteResolved }) {
       onChangeRef.current('')
       onRouteResolved?.(null)
     })
-    return () => { if (container.contains(el)) container.removeChild(el) }
+    el.addEventListener('focus', () => { document.body.style.overflow = 'hidden' }, true)
+    el.addEventListener('blur', () => { document.body.style.overflow = '' }, true)
+    return () => {
+      document.body.style.overflow = ''
+      if (container.contains(el)) container.removeChild(el)
+    }
   }, [google])
 
   useEffect(() => {
@@ -251,6 +257,7 @@ function PlacesFields({ google, loading, onChange, onRouteResolved }) {
     el.addEventListener('gmp-select', async ({ placePrediction }) => {
       const place = placePrediction.toPlace()
       await place.fetchFields({ fields: ['location'] })
+      document.body.style.overflow = ''
       setToLoc(place.location ?? null)
     })
     el.addEventListener('input', () => {
@@ -259,7 +266,12 @@ function PlacesFields({ google, loading, onChange, onRouteResolved }) {
       onChangeRef.current('')
       onRouteResolved?.(null)
     })
-    return () => { if (container.contains(el)) container.removeChild(el) }
+    el.addEventListener('focus', () => { document.body.style.overflow = 'hidden' }, true)
+    el.addEventListener('blur', () => { document.body.style.overflow = '' }, true)
+    return () => {
+      document.body.style.overflow = ''
+      if (container.contains(el)) container.removeChild(el)
+    }
   }, [google])
 
   useEffect(() => {

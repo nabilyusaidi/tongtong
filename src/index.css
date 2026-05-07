@@ -9,7 +9,7 @@ gmp-place-autocomplete { width: 100%; color-scheme: light; }
 .dark gmp-place-autocomplete { color-scheme: dark; }
 
 /* Force light-mode surface colours from outside the closed shadow DOM */
-.autocomplete-wrap { position: relative; border-radius: 0.5rem; overflow: hidden; }
+.autocomplete-wrap { position: relative; border-radius: 0.5rem; overflow: hidden; scroll-margin-top: 1rem; }
 .autocomplete-wrap gmp-place-autocomplete { display: block; }
 
 /* Override the web component's inline background by layering our own behind it */
