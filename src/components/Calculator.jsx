@@ -211,8 +211,8 @@ function PlacesDistanceField({ value, onChange, onRouteResolved }) {
 
 
 function PlacesFields({ google, loading, onChange, onRouteResolved }) {
-  const fromContainerRef = useRef(null)
-  const toContainerRef = useRef(null)
+  const fromInputRef = useRef(null)
+  const toInputRef = useRef(null)
   const [fromLoc, setFromLoc] = useState(null)
   const [toLoc, setToLoc] = useState(null)
   const [resolvedKm, setResolvedKm] = useState(null)
@@ -221,57 +221,43 @@ function PlacesFields({ google, loading, onChange, onRouteResolved }) {
   useEffect(() => { onChangeRef.current = onChange }, [onChange])
 
   useEffect(() => {
-    if (!google || !fromContainerRef.current) return
-    const container = fromContainerRef.current
-    const el = new google.maps.places.PlaceAutocompleteElement({
-      includedRegionCodes: ['my'],
+    if (!google || !fromInputRef.current) return
+    const ac = new google.maps.places.Autocomplete(fromInputRef.current, {
+      componentRestrictions: { country: 'my' },
+      fields: ['geometry'],
     })
-    container.appendChild(el)
-    el.addEventListener('gmp-select', async ({ placePrediction }) => {
-      const place = placePrediction.toPlace()
-      await place.fetchFields({ fields: ['location'] })
-      document.body.style.overflow = ''
-      setFromLoc(place.location ?? null)
+    const listener = ac.addListener('place_changed', () => {
+      const place = ac.getPlace()
+      if (place.geometry?.location) {
+        setFromLoc(place.geometry.location)
+      } else {
+        setFromLoc(null)
+        setResolvedKm(null)
+        onChangeRef.current('')
+        onRouteResolved?.(null)
+      }
     })
-    el.addEventListener('input', () => {
-      setFromLoc(null)
-      setResolvedKm(null)
-      onChangeRef.current('')
-      onRouteResolved?.(null)
-    })
-    el.addEventListener('focus', () => { document.body.style.overflow = 'hidden' }, true)
-    el.addEventListener('blur', () => { document.body.style.overflow = '' }, true)
-    return () => {
-      document.body.style.overflow = ''
-      if (container.contains(el)) container.removeChild(el)
-    }
+    return () => google.maps.event.removeListener(listener)
   }, [google])
 
   useEffect(() => {
-    if (!google || !toContainerRef.current) return
-    const container = toContainerRef.current
-    const el = new google.maps.places.PlaceAutocompleteElement({
-      includedRegionCodes: ['my'],
+    if (!google || !toInputRef.current) return
+    const ac = new google.maps.places.Autocomplete(toInputRef.current, {
+      componentRestrictions: { country: 'my' },
+      fields: ['geometry'],
     })
-    container.appendChild(el)
-    el.addEventListener('gmp-select', async ({ placePrediction }) => {
-      const place = placePrediction.toPlace()
-      await place.fetchFields({ fields: ['location'] })
-      document.body.style.overflow = ''
-      setToLoc(place.location ?? null)
+    const listener = ac.addListener('place_changed', () => {
+      const place = ac.getPlace()
+      if (place.geometry?.location) {
+        setToLoc(place.geometry.location)
+      } else {
+        setToLoc(null)
+        setResolvedKm(null)
+        onChangeRef.current('')
+        onRouteResolved?.(null)
+      }
     })
-    el.addEventListener('input', () => {
-      setToLoc(null)
-      setResolvedKm(null)
-      onChangeRef.current('')
-      onRouteResolved?.(null)
-    })
-    el.addEventListener('focus', () => { document.body.style.overflow = 'hidden' }, true)
-    el.addEventListener('blur', () => { document.body.style.overflow = '' }, true)
-    return () => {
-      document.body.style.overflow = ''
-      if (container.contains(el)) container.removeChild(el)
-    }
+    return () => google.maps.event.removeListener(listener)
   }, [google])
 
   useEffect(() => {
@@ -288,6 +274,8 @@ function PlacesFields({ google, loading, onChange, onRouteResolved }) {
         onRouteResolved?.(null)
       })
   }, [fromLoc, toLoc])
+
+  const inputClass = "w-full px-3 py-2 text-sm rounded-lg bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:bg-neutral-800 dark:border-white/5 dark:text-white dark:placeholder:text-neutral-500 dark:focus:ring-neutral-600"
 
   return (
     <div className="py-1 space-y-2">
@@ -307,12 +295,12 @@ function PlacesFields({ google, loading, onChange, onRouteResolved }) {
         </div>
       ) : (
         <div className="space-y-1.5">
-          <div className="autocomplete-wrap">
-            <div ref={fromContainerRef} />
-          </div>
-          <div className="autocomplete-wrap">
-            <div ref={toContainerRef} />
-          </div>
+          <input ref={fromInputRef} type="text" placeholder="From" className={inputClass}
+            onChange={() => { setFromLoc(null); setResolvedKm(null); onChangeRef.current(''); onRouteResolved?.(null) }}
+          />
+          <input ref={toInputRef} type="text" placeholder="To" className={inputClass}
+            onChange={() => { setToLoc(null); setResolvedKm(null); onChangeRef.current(''); onRouteResolved?.(null) }}
+          />
         </div>
       )}
     </div>
