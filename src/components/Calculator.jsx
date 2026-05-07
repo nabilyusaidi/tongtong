@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { calculateTrip } from '../lib/calculator'
-import { useMapsLoader, computeRoute } from '../lib/maps'
+import { computeRoute } from '../lib/maps'
+import PlacesInput from './PlacesInput'
 import { lookupToll } from '../lib/tolls'
 
 const CAR_PRESETS = {
@@ -189,9 +190,8 @@ function CarTypeSelector({ value, onChange }) {
 
 function PlacesDistanceField({ value, onChange, onRouteResolved }) {
   const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
-  const { google, loading, error } = useMapsLoader()
 
-  if (!key || error) {
+  if (!key) {
     return (
       <Field
         label="Distance"
@@ -206,59 +206,16 @@ function PlacesDistanceField({ value, onChange, onRouteResolved }) {
     )
   }
 
-  return <PlacesFields google={google} loading={loading} onChange={onChange} onRouteResolved={onRouteResolved} />
+  return <PlacesFields onChange={onChange} onRouteResolved={onRouteResolved} />
 }
 
-
-function PlacesFields({ google, loading, onChange, onRouteResolved }) {
-  const fromInputRef = useRef(null)
-  const toInputRef = useRef(null)
+function PlacesFields({ onChange, onRouteResolved }) {
   const [fromLoc, setFromLoc] = useState(null)
   const [toLoc, setToLoc] = useState(null)
   const [resolvedKm, setResolvedKm] = useState(null)
   const onChangeRef = useRef(onChange)
 
   useEffect(() => { onChangeRef.current = onChange }, [onChange])
-
-  useEffect(() => {
-    if (!google || !fromInputRef.current) return
-    const ac = new google.maps.places.Autocomplete(fromInputRef.current, {
-      componentRestrictions: { country: 'my' },
-      fields: ['geometry'],
-    })
-    const listener = ac.addListener('place_changed', () => {
-      const place = ac.getPlace()
-      if (place.geometry?.location) {
-        setFromLoc(place.geometry.location)
-      } else {
-        setFromLoc(null)
-        setResolvedKm(null)
-        onChangeRef.current('')
-        onRouteResolved?.(null)
-      }
-    })
-    return () => google.maps.event.removeListener(listener)
-  }, [google])
-
-  useEffect(() => {
-    if (!google || !toInputRef.current) return
-    const ac = new google.maps.places.Autocomplete(toInputRef.current, {
-      componentRestrictions: { country: 'my' },
-      fields: ['geometry'],
-    })
-    const listener = ac.addListener('place_changed', () => {
-      const place = ac.getPlace()
-      if (place.geometry?.location) {
-        setToLoc(place.geometry.location)
-      } else {
-        setToLoc(null)
-        setResolvedKm(null)
-        onChangeRef.current('')
-        onRouteResolved?.(null)
-      }
-    })
-    return () => google.maps.event.removeListener(listener)
-  }, [google])
 
   useEffect(() => {
     if (!fromLoc || !toLoc) return
@@ -275,7 +232,11 @@ function PlacesFields({ google, loading, onChange, onRouteResolved }) {
       })
   }, [fromLoc, toLoc])
 
-  const inputClass = "w-full px-3 py-2 text-sm rounded-lg bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:bg-neutral-800 dark:border-white/5 dark:text-white dark:placeholder:text-neutral-500 dark:focus:ring-neutral-600"
+  function clearRoute() {
+    setResolvedKm(null)
+    onChangeRef.current('')
+    onRouteResolved?.(null)
+  }
 
   return (
     <div className="py-1 space-y-2">
@@ -288,21 +249,18 @@ function PlacesFields({ google, loading, onChange, onRouteResolved }) {
           {resolvedKm ? `${resolvedKm} km driving` : 'Select from and to in Malaysia'}
         </p>
       </div>
-      {loading ? (
-        <div className="space-y-1.5">
-          <div className="h-9 rounded-lg bg-slate-100 dark:bg-neutral-800 animate-pulse" />
-          <div className="h-9 rounded-lg bg-slate-100 dark:bg-neutral-800 animate-pulse" />
-        </div>
-      ) : (
-        <div className="space-y-1.5">
-          <input ref={fromInputRef} type="text" placeholder="From" className={inputClass}
-            onChange={() => { setFromLoc(null); setResolvedKm(null); onChangeRef.current(''); onRouteResolved?.(null) }}
-          />
-          <input ref={toInputRef} type="text" placeholder="To" className={inputClass}
-            onChange={() => { setToLoc(null); setResolvedKm(null); onChangeRef.current(''); onRouteResolved?.(null) }}
-          />
-        </div>
-      )}
+      <div className="space-y-1.5">
+        <PlacesInput
+          placeholder="From"
+          onSelect={loc => { setFromLoc(loc); if (toLoc) clearRoute() }}
+          onClear={() => { setFromLoc(null); clearRoute() }}
+        />
+        <PlacesInput
+          placeholder="To"
+          onSelect={loc => { setToLoc(loc); if (fromLoc) clearRoute() }}
+          onClear={() => { setToLoc(null); clearRoute() }}
+        />
+      </div>
     </div>
   )
 }
