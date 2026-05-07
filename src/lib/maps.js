@@ -27,5 +27,7 @@ export async function computeRoute(origin, destination) {
 
   const distanceKm = Math.round(route.distanceMeters / 1000)
   const routeLegs = route.legs ?? []
+  // TEMP: expose raw response for toll match-string research — remove before ship
+  if (typeof window !== 'undefined') window.__lastRoute = data
   return { distanceKm, routeLegs }
 }
