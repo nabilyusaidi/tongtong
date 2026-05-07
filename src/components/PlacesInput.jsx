@@ -74,13 +74,13 @@ export default function PlacesInput({ placeholder, onSelect, onClear }) {
       />
       {isOpen && suggestions.length > 0 && (
         <ul className="absolute z-50 left-0 right-0 mt-1 rounded-lg border border-slate-200 bg-white shadow-lg overflow-hidden dark:bg-neutral-900 dark:border-white/10">
-          {suggestions.map(s => (
+          {suggestions.map(suggestion => (
             <li
-              key={s.placeId}
-              onMouseDown={() => handleSelect(s)}
+              key={suggestion.placeId}
+              onMouseDown={() => handleSelect(suggestion)}
               className="px-3 py-2 text-sm text-slate-800 dark:text-neutral-200 cursor-pointer hover:bg-slate-100 dark:hover:bg-neutral-800 truncate"
             >
-              {s.text}
+              {suggestion.text}
             </li>
           ))}
         </ul>
