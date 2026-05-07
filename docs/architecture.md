@@ -16,7 +16,7 @@ TongTong is a static, client-side web application. It calculates how much each p
 | Concern | Choice | Rationale |
 |---|---|---|
 | Framework | Vite + React | No SSR needed. Static calculator. |
-| Language | JavaScript | Four input fields feeding one formula. No type complexity that justifies TS overhead. |
+| Language | JavaScript | No type complexity that justifies TS overhead. |
 | UI components | Tailwind CSS | No component library justified for this scope. |
 | Backend | None | Pure client-side. No data to persist. |
 | Auth | None | No accounts. |
@@ -31,53 +31,92 @@ TongTong is a static, client-side web application. It calculates how much each p
 | No backend | Zero server-side code. No API routes. No database. |
 | No auth | No accounts, no login, no sessions. Ever. |
 | No component libraries | Plain Tailwind CSS only. |
-| External API calls | Phase 1–5: none — pure JS, fully offline-capable. Phase 6+: `data.gov.my` (fuel price fetch) and Google Maps JS SDK (Places Autocomplete + Distance Matrix). Falls back gracefully if either is unavailable. |
 | Mobile-first | Must work on a 375px viewport in a moving car. |
 | Zero config deploy | Must deploy to Vercel with no custom build configuration. |
 
 ---
 
-## §4 — Data flow
+## §4 — External APIs
 
-```
-User input (4 fields + 1 stepper)
-        │
-        ▼
-React state (controlled inputs)
-        │
-        ▼
-src/lib/calculator.js (pure functions)
-  - calculateFuelCost(fuelPrice, consumption, distance)
-  - calculateTotalCost(fuelCost, toll)
-  - calculatePerPerson(totalCost, passengers)
-        │
-        ▼
-Rendered result (per-person amount + breakdown)
-```
+| API | Purpose | Fallback |
+|---|---|---|
+| Google Places API (v1) | Location autocomplete restricted to Malaysia | Manual distance text input |
+| Google Routes API (v2) | Driving distance + navigation steps for toll detection | Manual distance text input |
+| data.gov.my (OpenDOSM) | Live weekly RON95 BUDI and RON97 fuel prices | Hardcoded defaults (RM1.99 / RM4.90) |
 
-No network requests. No side effects. No persistence.
+All API calls are made directly from the browser. The Google Maps API key is restricted to the production domain via HTTP referrer in Google Cloud Console.
 
 ---
 
-## §5 — File structure
+## §5 — Data flow
+
+```
+User selects From / To
+        │
+        ▼
+Google Places API → location coordinates
+        │
+        ▼
+Google Routes API → driving distance (km) + navigation steps
+        │                │
+        │                ▼
+        │        src/lib/tolls.js
+        │        lookupToll(routeLegs)
+        │        → matched corridor + one-way toll
+        │                │
+        ▼                ▼
+React state (distance, toll, fuelPrice, consumption, passengers, isReturn)
+        │
+        ▼
+src/lib/calculator.js (pure functions)
+  calculateTrip({ fuelPrice, consumption, distance, toll, passengers, isReturn })
+  → { fuelCost, tollCost, totalCost, perPerson }
+        │
+        ▼
+ResultCard — per-person amount + breakdown
+```
+
+Fuel price is fetched once on mount from data.gov.my and stored in component state. No persistence, no caching.
+
+---
+
+## §6 — Toll detection
+
+The Routes API returns navigation steps, each with a Malay instruction string and a maneuver type. `src/lib/tolls.js` matches known highway name substrings against each step individually, filtering out signpost-only references (steps with maneuver `RAMP_*` or instruction text containing `papan tanda` / `ke arah`).
+
+Two categories:
+- **Open tolls** (`CORRIDORS`) — fixed fare, auto-filled. Covers LDP, SPRINT, KESAS, DUKE, Federal Hwy, SMART, NPE, Cheras-Kajang, SILK, Karak/Genting, Penang Bridge, Sungai Besi.
+- **Closed tolls** (`CLOSED_TOLL_HIGHWAYS`) — distance-based fare, user prompted to enter manually. Covers PLUS (N/S), ELITE, LPT, SDE, BKE.
+
+See [tolls.md](tolls.md) for the full supported corridor list and known limitations.
+
+---
+
+## §7 — File structure
 
 ```
 tongtong/
 ├── docs/
-│   └── architecture.md
+│   ├── architecture.md
+│   └── tolls.md
 ├── public/
-│   └── favicon.ico
+│   └── favicon.svg
 ├── src/
 │   ├── components/
-│   │   ├── Calculator.jsx
-│   │   ├── ResultCard.jsx
-│   │   └── PassengerChips.jsx
+│   │   ├── Calculator.jsx     — main form: car type, fuel price, distance, toll, passengers
+│   │   ├── PlacesInput.jsx    — autocomplete input with keyboard navigation
+│   │   ├── ResultCard.jsx     — cost breakdown output
+│   │   ├── PassengerChips.jsx — passenger count selector
+│   │   ├── Explanation.jsx    — how-it-works copy
+│   │   └── Guide.jsx          — usage guide copy
 │   ├── lib/
-│   │   └── calculator.js
+│   │   ├── calculator.js      — pure cost calculation functions
+│   │   ├── maps.js            — Google Routes API call
+│   │   ├── places.js          — Google Places API calls
+│   │   └── tolls.js           — toll corridor definitions + detection logic
 │   ├── App.jsx
 │   ├── main.jsx
 │   └── index.css
-├── CHANGELOG.md
 ├── README.md
 ├── index.html
 └── vite.config.js
