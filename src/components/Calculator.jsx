@@ -278,7 +278,7 @@ function PlacesFields({ onChange, onRouteResolved }) {
           onClick={() => setIsReturn(r => !r)}
           className={`shrink-0 text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${
             isReturn
-              ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white'
+              ? 'bg-blue-600 text-white border-blue-600'
               : 'bg-transparent text-slate-600 border-slate-200 dark:text-neutral-400 dark:border-white/10'
           }`}
         >
